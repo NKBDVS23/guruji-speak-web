@@ -2718,8 +2718,7 @@ def customer_login_otp(request):
             # Send the OTP to the user's email as plain text
             subject = 'Login OTP'
             message = f"Dear {name},\n\nYour OTP for login is: {otp}\n\nPlease enter this OTP to log in to your account.\n\nThank you!"
-            send_mail(subject, message, 'your-email@example.com', [user.email_id], fail_silently=False)
-
+           # send_mail(subject, message, 'your-email@example.com', [user.email_id], fail_silently=False)
             otp_login_sms([user_id], name, otp)
 
             # Redirect to OTP verification page
