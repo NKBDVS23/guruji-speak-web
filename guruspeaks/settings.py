@@ -209,7 +209,8 @@ CARE_FROM_EMAIL = 'care@gurujispeaks.com'
 CARE_EMAIL_HOST = 'smtp.gmail.com'
 CARE_EMAIL_PORT = 587
 EMAIL_HOST_USER_CARE = 'care@gurujispeaks.com'
-EMAIL_HOST_PASSWORD_CARE = 'ijczxttduzjnirur'
+#EMAIL_HOST_PASSWORD_CARE = 'ijczxttduzjnirur'
+EMAIL_HOST_PASSWORD_CARE='urdj pipi bbtg mjrj'
 EMAIL_USE_TLS_CARE = True  # Use TLS for secure connection
 
 # Third email configuration
@@ -218,7 +219,8 @@ CAREERS_FROM_EMAIL = 'careers@gurujispeaks.com'
 CAREERS_EMAIL_HOST = 'smtp.gmail.com'
 CAREERS_EMAIL_PORT = 587
 EMAIL_HOST_USER_CAREERS = 'careers@gurujispeaks.com'
-EMAIL_HOST_PASSWORD_CAREERS = 'utiqjtoqzbgvjexj'
+#EMAIL_HOST_PASSWORD_CAREERS = 'utiqjtoqzbgvjexj'
+EMAIL_HOST_PASSWORD_CAREERS='knxu oxir izqh yaby'
 EMAIL_USE_TLS_CAREERS = True  # Use TLS for secure connection
 
 
