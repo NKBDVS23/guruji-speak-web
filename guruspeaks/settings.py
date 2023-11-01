@@ -199,7 +199,8 @@ DEFAULT_FROM_EMAIL = 'info@gurujispeaks.com'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'info@gurujispeaks.com'
-EMAIL_HOST_PASSWORD = 'wxtlwrvkxszgoorj'
+# EMAIL_HOST_PASSWORD = 'wxtlwrvkxszgoorj'
+EMAIL_HOST_PASSWORD ='rqqr pguo ijwn hpqf'
 EMAIL_USE_TLS = True  # Use TLS for secure connection
 
 # Secondary email configuration
