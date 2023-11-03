@@ -54,7 +54,7 @@ PAYPAL_MODE = 'sandbox'
 
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
