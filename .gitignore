@@ -1,2 +1,42 @@
-/Business_setting/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
+# Local development settings
+local_settings.py
+
+# Database
+db.sqlite3
+
+# Static files (usually collected and served by Django)
+static/
+
+# Media files
+media/
+
+# Virtual environment
+venv/
+env/
+
+# Compiled Python files
+*.pyc
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Visual Studio Code settings
+.vscode/
+
+# IDE-specific files
+.idea/
+
+# Log files
+*.log
+
+# Ignore secret keys
+*.secret
