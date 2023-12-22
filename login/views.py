@@ -4708,6 +4708,7 @@ def ram(request):
 
 
 def check_status(request):
+    
     plan_id = request.session.get('plan_id')
     transaction_id = request.session.get('transaction_id')
     muser_id = request.session.get('muser_id')
@@ -4734,80 +4735,88 @@ def check_status(request):
     }
 
     url = f"https://api.phonepe.com/apis/hermes/pg/v1/status/M1V0CXVZ7AGF/{transaction_id}"
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers);
+    
 
     data = json.loads(response.text)
-
+    
     # Extracting the "success" value
     success = data.get("success")
 
-    print(success)
+    print('sucess',success)
 
 
     if success: 
-
+       
         response_data = response.json()
-        
-        
-        done = Wallet(
-            order_id=generate_order_id(),
-            payment_id = transaction_id, 
-            recharge_amount = float(amount) * 1.5,
-            plan_recharge_date = plan_recharge_date,
-            recharge_time = recharge_time,
-            wallet_month= wallet_month,
-            name = name,
-            cust_id=muser_id,
-            email_id=email_id,
-            whatsapp_no=whatsapp_no,
-            transaction_id=transaction_id,
-            )
-        done.save()
-        aa=GurujiUsers.objects.filter(email_id=email_id)
-        for i in aa:
-            first_name1 = i.first_name
-            last_name1 = i. last_name
-            whatsapp_no = i.whatsapp_no
-
-        name = name
-        recipient_numbers=whatsapp_no
-        print('ddddddddd',name,whatsapp_no)
-
-        send_sms_wallet([recipient_numbers],name,amount)
-        plan_id = request.session.get('plan_id')
-        plan_data = Comment.objects.filter(plan_id=plan_id, object_id = muser_id, order_id = "")
-        for j in plan_data:
-            if j.plan_name == "Stellar Insights": 
-                plan_name = j.plan_name
-                del request.session["plan_id"]
-                context={'plan_name':plan_name}
-                # return redirect('/ask_question_silver/')
-                return render(request,'login/pass.html',context)
-
-            elif j.plan_name == "Divine Revelations":
-                del request.session["plan_id"]
-                plan_name = j.plan_name
-                context={'plan_name':plan_name}
-                # return redirect('/ask_question_platinum/')
-                return render(request,'login/pass.html',context)
-            elif j.plan_name == "Celestial Guidance":
-                del request.session["plan_id"]   
-                plan_name = j.plan_name
-                context={'plan_name':plan_name}
-                # return redirect('/ask_question_gold/')
-                return render(request,'login/pass.html',context)
-            else:
-                # return redirect('/customer-wallet/')
-                plan_name = ''
-                context={'plan_name':plan_name}
-                return render(request,'login/pass.html',context)
-
-        
-        context = {
+        print('response -data ',response_data)
+        if response_data['code'] == 'PAYMENT_PENDING':
             
-            'plan_name':None,
-        }
-        return render(request,'login/pass.html',context)
+             plan_id = request.session.get('plan_id')
+             context={'plan_id':plan_id}
+             
+             return render(request,"phonepe_fail.html",context)
+        else:   
+        
+            done = Wallet(
+                order_id=generate_order_id(),
+                payment_id = transaction_id, 
+                recharge_amount = float(amount) * 1.5,
+                plan_recharge_date = plan_recharge_date,
+                recharge_time = recharge_time,
+                wallet_month= wallet_month,
+                name = name,
+                cust_id=muser_id,
+                email_id=email_id,
+                whatsapp_no=whatsapp_no,
+                transaction_id=transaction_id,
+                )
+            done.save()
+            aa=GurujiUsers.objects.filter(email_id=email_id)
+            for i in aa:
+                first_name1 = i.first_name
+                last_name1 = i. last_name
+                whatsapp_no = i.whatsapp_no
+
+            name = name
+            recipient_numbers=whatsapp_no
+            print('ddddddddd',name,whatsapp_no)
+
+            send_sms_wallet([recipient_numbers],name,amount)
+            plan_id = request.session.get('plan_id')
+            plan_data = Comment.objects.filter(plan_id=plan_id, object_id = muser_id, order_id = "")
+            for j in plan_data:
+                if j.plan_name == "Stellar Insights": 
+                    plan_name = j.plan_name
+                    del request.session["plan_id"]
+                    context={'plan_name':plan_name}
+                    # return redirect('/ask_question_silver/')
+                    return render(request,'login/pass.html',context)
+
+                elif j.plan_name == "Divine Revelations":
+                    del request.session["plan_id"]
+                    plan_name = j.plan_name
+                    context={'plan_name':plan_name}
+                    # return redirect('/ask_question_platinum/')
+                    return render(request,'login/pass.html',context)
+                elif j.plan_name == "Celestial Guidance":
+                    del request.session["plan_id"]   
+                    plan_name = j.plan_name
+                    context={'plan_name':plan_name}
+                    # return redirect('/ask_question_gold/')
+                    return render(request,'login/pass.html',context)
+                else:
+                    # return redirect('/customer-wallet/')
+                    plan_name = ''
+                    context={'plan_name':plan_name}
+                    return render(request,'login/pass.html',context)
+
+            
+            context = {
+                
+                'plan_name':None,
+            }
+            return render(request,'login/pass.html',context)
 
     else:
         plan_id = request.session.get('plan_id')
@@ -4918,6 +4927,7 @@ def customer_recharge(request,paisa):
 
     if response.status_code == 200:
         response_data = response.json()   
+        print(response_data)
         print('response_data["success"]',response_data["success"])
         if "success" in response_data and response_data["success"]:   
             # done = Wallet(
@@ -4937,6 +4947,7 @@ def customer_recharge(request,paisa):
             
             redirect_info = response_data["data"]["instrumentResponse"]["redirectInfo"]
             redirect_url = redirect_info.get("url", "Redirect URL not provided")
+            print('redirect url ',redirect_url)
             return render(request, 'payment_form.html', {'success': True, 'result': redirect_url})
         else:
             error_message = response_data.get("message", "Unknown error occurred")
