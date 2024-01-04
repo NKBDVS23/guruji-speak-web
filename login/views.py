@@ -4823,8 +4823,8 @@ def check_status(request):
         context={'plan_id':plan_id}
         return render(request,"phonepe_fail.html",context)
     
-import logging
-logger=logging.getLogger('login.views')
+#import logging
+#logger=logging.getLogger('login.views')
 
 @csrf_exempt
 def customer_recharge(request,paisa):
@@ -4948,7 +4948,7 @@ def customer_recharge(request,paisa):
             #     transaction_id=transaction_id,
             #     )
             # done.save()
-            logger.info("response data",response_data['data'])
+            #logger.info("response data",response_data['data'])
             redirect_info = response_data["data"]["instrumentResponse"]["redirectInfo"]
             redirect_url = redirect_info.get("url", "Redirect URL not provided")
             print('redirect url ',redirect_url)
@@ -4988,10 +4988,10 @@ def customer_recharge(request,paisa):
     #     return redirect(url)
 
 
-"""
+
 @login_required
 def initiate_payment(request,paisa):
-    logger.info("payment start")
+    #logger.info("payment start")
     data = admin_setting_plan.objects.all()
     plan = Plan_Purchase.objects.all()
     plan_data = Plan_Purchase.objects.filter(payment_id='')
@@ -5037,7 +5037,7 @@ def initiate_payment(request,paisa):
         print("***********")
         print("Order of razor pay",razorpay_order['id'])
         print("***********")
-        logger.info('info',razorpay_order)
+        #logger.info('info',razorpay_order)
         request.session['razorpay_payment_id']=razorpay_order['id']
         print("sesioin amount",request.session.get("amount"))
         return render(request,'payment.html',{
@@ -5050,8 +5050,7 @@ def initiate_payment(request,paisa):
             "email":request.user.email_id
         })
     return render(request,"payment.html")
-"""
-"""
+
 from django.http import HttpResponseBadRequest  
      
 @csrf_exempt
@@ -5069,7 +5068,7 @@ def callback(request):
     whatsapp_no =request.session.get('whatsapp_no')
      # only accept POST request.
     if request.method == "POST":
-        logger.info('razor post payload',request.POST)
+        #logger.info('razor post payload',request.POST)
         client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZORPAY_KEY_SECRET ))
         try:
             
@@ -5082,7 +5081,7 @@ def callback(request):
                'razorpay_payment_id': payment_id,
                'razorpay_signature': signature
                }
-            logger.info('razor post payload',order_id,payment_id,signature)
+            #logger.info('razor post payload',order_id,payment_id,signature)
             #print("signature id ",signature,"razorpay_id",razorpay_order_id)
             # verify the payment signature.
             result = client.utility.verify_payment_signature(
@@ -5136,7 +5135,7 @@ def callback(request):
         return HttpResponseBadRequest()
               
         
-"""           
+           
         
 def execute_payment(request):
     payment_id = request.GET.get('paymentId')
