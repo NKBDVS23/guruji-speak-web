@@ -244,10 +244,12 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(message)s ',
-            'style': '{',
-        },
+       'simple': {
+        'format': '[%(asctime)s] %(levelname)s %(message)s',
+    },
+    'verbose': {
+        'format': '[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s',
+    },
     },
     'handlers': {
         'console': {
