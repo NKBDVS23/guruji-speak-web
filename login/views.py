@@ -5073,8 +5073,8 @@ def callback(request):
         try:
             
             # get the required parameters from post request.
-            order_id = request.POST.get('order_id')
-            payment_id = request.POST.get('razorpay_payment_id')
+            order_id = request.POST.get('razorpay_payment_id')
+            payment_id = request.POST.get('razorpay_order_id')
             signature = request.POST.get('razorpay_signature')
             params_dict = {
               'razorpay_order_id': order_id,
