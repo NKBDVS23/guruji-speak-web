@@ -5129,7 +5129,8 @@ def callback(request):
         except:
  
             # if we don't find the required parameters in POST data
-            return HttpResponseBadRequest()
+            #return HttpResponseBadRequest()
+            return render(request,"phonepe_fail.html")
     else:
        # if other than POST request is made.
         return HttpResponseBadRequest()
