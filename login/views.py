@@ -4823,8 +4823,8 @@ def check_status(request):
         context={'plan_id':plan_id}
         return render(request,"phonepe_fail.html",context)
     
-#import logging
-#logger=logging.getLogger('login.views')
+import logging
+logger=logging.getLogger('login.views')
 
 @csrf_exempt
 def customer_recharge(request,paisa):
@@ -4920,6 +4920,7 @@ def customer_recharge(request,paisa):
     url = "https://api.phonepe.com/apis/hermes/pg/v1/pay"
     response = requests.post(url, json=payload, headers=headers)
     
+    
 
 
     # print(response.text)
@@ -4947,7 +4948,7 @@ def customer_recharge(request,paisa):
             #     transaction_id=transaction_id,
             #     )
             # done.save()
-            
+            logger.info("response data",response_data['data'])
             redirect_info = response_data["data"]["instrumentResponse"]["redirectInfo"]
             redirect_url = redirect_info.get("url", "Redirect URL not provided")
             print('redirect url ',redirect_url)
