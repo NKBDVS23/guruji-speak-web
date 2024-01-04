@@ -4823,8 +4823,8 @@ def check_status(request):
         context={'plan_id':plan_id}
         return render(request,"phonepe_fail.html",context)
     
-import logging
-logger=logging.getLogger('login.views')
+#import logging
+#logger=logging.getLogger('login.views')
 
 @csrf_exempt
 def customer_recharge(request,paisa):
@@ -4987,7 +4987,7 @@ def customer_recharge(request,paisa):
     #     return redirect(url)
 
 
-
+"""
 @login_required
 def initiate_payment(request,paisa):
     logger.info("payment start")
@@ -5049,7 +5049,8 @@ def initiate_payment(request,paisa):
             "email":request.user.email_id
         })
     return render(request,"payment.html")
-        
+"""
+"""
 from django.http import HttpResponseBadRequest  
      
 @csrf_exempt
@@ -5134,7 +5135,7 @@ def callback(request):
         return HttpResponseBadRequest()
               
         
-        
+"""           
         
 def execute_payment(request):
     payment_id = request.GET.get('paymentId')
