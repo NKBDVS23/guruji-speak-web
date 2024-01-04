@@ -5073,8 +5073,8 @@ def callback(request):
         try:
             
             # get the required parameters from post request.
-            order_id = request.POST.get('razorpay_payment_id')
-            payment_id = request.POST.get('razorpay_order_id')
+            order_id = request.POST.get('razorpay_order_id')
+            payment_id = request.POST.get('razorpay_payment_id')
             signature = request.POST.get('razorpay_signature')
             params_dict = {
               'razorpay_order_id': order_id,
@@ -5129,7 +5129,8 @@ def callback(request):
         except:
  
             # if we don't find the required parameters in POST data
-            return HttpResponseBadRequest()
+            #return HttpResponseBadRequest()
+            return render(request,"phonepe_fail.html")
     else:
        # if other than POST request is made.
         return HttpResponseBadRequest()
