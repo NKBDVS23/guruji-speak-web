@@ -5088,10 +5088,10 @@ def callback(request):
                 params_dict)
             if result is not None:
                 amount =request.session.get('amount')
-                try:
+               # try:
                     # capture the payemt
-                    client.payment.capture(payment_id, amount)
-                    done = Wallet(
+                #client.payment.capture(payment_id, amount)3
+                done = Wallet(
                       order_id=order_id,
                       payment_id = payment_id, 
                       recharge_amount = float(amount) * 1.5,
@@ -5104,24 +5104,24 @@ def callback(request):
                       whatsapp_no=whatsapp_no,
                       transaction_id=transaction_id,
                      )
-                    done.save()
-                    aa=GurujiUsers.objects.filter(email_id=email_id)
-                    for i in aa:
+                done.save()
+                aa=GurujiUsers.objects.filter(email_id=email_id)
+                for i in aa:
                        first_name1 = i.first_name
                        last_name1 = i. last_name
                        whatsapp_no = i.whatsapp_no
 
-                    name = name
-                    recipient_numbers=whatsapp_no
-                    print('ddddddddd',name,whatsapp_no)
+                name = name
+                recipient_numbers=whatsapp_no
+                print('ddddddddd',name,whatsapp_no)
 
-                    send_sms_wallet([recipient_numbers],name,amount)
+                send_sms_wallet([recipient_numbers],name,amount)
                     # render success page on successful caputre of payment
-                    return render(request,'login/pass.html')
-                except:
+                return render(request,'login/pass.html')
+                #except:
  
                     # if there is an error while capturing payment.
-                    return render(request,"phonepe_fail.html")
+                    ##return render(request,"phonepe_fail.html")
             else:
  
                 # if signature verification fails.
