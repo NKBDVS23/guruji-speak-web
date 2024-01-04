@@ -236,3 +236,50 @@ CKEDITOR_UPLOAD_PATH = "uploads/"
 CSRF_TRUSTED_ORIGINS = ['https://gurujispeaks.com', 'https://www.gurujispeaks.com']
 
 
+#razor pay
+RAZOR_KEY_ID = 'rzp_live_G7TLS6uiLWDmqb'
+RAZORPAY_KEY_SECRET ='CIny2b9ucklTtktvsxXtXiL7'
+
+
+
+
+#logger configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': Path.joinpath(BASE_DIR,'logs/django.log'),
+            'formatter': 'verbose',
+        },
+        'email': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
+        },
+        
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'login': {
+            'handlers': ['console', 'file', 'email'],
+            'level': 'DEBUG',
+        },
+    },
+}

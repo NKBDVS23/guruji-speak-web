@@ -4823,7 +4823,8 @@ def check_status(request):
         context={'plan_id':plan_id}
         return render(request,"phonepe_fail.html",context)
     
-
+import logging
+logger=logging.getLogger('login.views')
 
 @csrf_exempt
 def customer_recharge(request,paisa):
@@ -4849,6 +4850,7 @@ def customer_recharge(request,paisa):
     month_alphabetic = date_obj.strftime('%B')
     invoice_number = random.randint(10000, 99999)
     amount = float(paisa)  # Default amount if not provided or if request method is not "POST"
+    print('paisaa is ',paisa)
     #amount = int(amount)  # Convert the amount to an integer
     currency = 'INR'
     transaction_id = generate_random_transaction_id()
@@ -4862,9 +4864,10 @@ def customer_recharge(request,paisa):
     request.session['name'] = f'{request.user.first_name} {request.user.last_name}'
     request.session['email_id'] = request.user.email_id
     request.session['whatsapp_no'] = request.user.whatsapp_no
-
-    
-
+    print("*******************")
+    print('name',request.user.first_name)
+    print('number',request.user.whatsapp_no)
+    print("*******************")
     
     
     saltKey = "5034b537-b639-498e-bb0f-927c119a3485"
@@ -4898,7 +4901,7 @@ def customer_recharge(request,paisa):
     encodeString = requestPayLoad + "/pg/v1/pay" + saltKey
     xVerify = hashlib.sha256(encodeString.encode()).hexdigest()
     xVerify = xVerify + "###" + saltIndex
-
+    
 
     print("request:",request_body,"\n\n Encode:",requestPayLoad,"\n\n xVerify:",xVerify)
     request_json = json.loads(request_body)
@@ -4983,6 +4986,155 @@ def customer_recharge(request,paisa):
     #     url = reverse('stripe-pay',args=[amount])
     #     return redirect(url)
 
+
+
+@login_required
+def initiate_payment(request,paisa):
+    logger.info("payment start")
+    data = admin_setting_plan.objects.all()
+    plan = Plan_Purchase.objects.all()
+    plan_data = Plan_Purchase.objects.filter(payment_id='')
+
+    # Add the 'geolocation_url' context variable to be used in the template
+
+    current_datetime_utc = datetime.now(pytz.utc)
+
+    # Convert the datetime to the Indian time zone
+    timezone = pytz.timezone('Asia/Kolkata')
+    current_datetime = current_datetime_utc.astimezone(timezone)
+    current_date = current_datetime.date()
+    # current_time = current_datetime.time()
+    current_time = current_datetime.time().strftime('%H:%M:%S')
+    formatted_date = current_date.strftime('%Y-%m-%d')
+    # date_obj = datetime.datetime.strptime(formatted_date, '%d-%m-%Y')
+    date_obj = datetime.strptime(formatted_date, '%Y-%m-%d')
+
+    # Get the month in alphabetic format
+    month_alphabetic = date_obj.strftime('%B')
+    invoice_number = random.randint(10000, 99999)
+    amount = float(paisa)  # Default amount if not provided or if request method is not "POST"
+    print('paisaa is ',paisa)
+    #amount = int(amount)  # Convert the amount to an integer
+    currency = 'INR'
+    transaction_id = generate_random_transaction_id()
+    
+    request.session['transaction_id'] = transaction_id
+    request.session['muser_id'] = request.user.user_id
+    request.session['amount'] = amount
+    request.session['plan_recharge_date'] = formatted_date
+    request.session['recharge_time'] = current_time
+    request.session['wallet_month'] = month_alphabetic
+    request.session['name'] = f'{request.user.first_name} {request.user.last_name}'
+    request.session['email_id'] = request.user.email_id
+    request.session['whatsapp_no'] = request.user.whatsapp_no
+    if request.method == "GET":
+        
+        client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZORPAY_KEY_SECRET ))
+        razorpay_order = client.order.create(
+            {"amount":amount*100 , "currency": "INR", "payment_capture": "1"}
+        )
+        print("***********")
+        print("Order of razor pay",razorpay_order['id'])
+        print("***********")
+        logger.info('info',razorpay_order)
+        request.session['razorpay_payment_id']=razorpay_order['id']
+        print("sesioin amount",request.session.get("amount"))
+        return render(request,'payment.html',{
+            "callback_url":"https://www.gurujispeaks.com/check-status/",
+            "amount":amount,
+            "razorpay_key":settings.RAZOR_KEY_ID,
+            "razorpay_order":razorpay_order['id'],
+            "user_name":request.user.first_name + request.user.last_name   ,
+            "contact":request.user.whatsapp_no,
+            "email":request.user.email_id
+        })
+    return render(request,"payment.html")
+        
+from django.http import HttpResponseBadRequest  
+     
+@csrf_exempt
+def callback(request):
+    
+    plan_id = request.session.get('plan_id')
+    transaction_id = request.session.get('transaction_id')
+    muser_id = request.session.get('muser_id')
+    amount =request.session.get('amount')
+    plan_recharge_date = request.session.get('plan_recharge_date')
+    recharge_time = request.session.get('recharge_time')
+    wallet_month =request.session.get('wallet_month')
+    name = request.session.get('name')
+    email_id = request.session.get('email_id')
+    whatsapp_no =request.session.get('whatsapp_no')
+     # only accept POST request.
+    if request.method == "POST":
+        logger.info('razor post payload',request.POST)
+        client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZORPAY_KEY_SECRET ))
+        try:
+            
+            # get the required parameters from post request.
+            order_id = request.POST.get('order_id')
+            payment_id = request.POST.get('razorpay_payment_id')
+            signature = request.POST.get('razorpay_signature')
+            params_dict = {
+              'razorpay_order_id': order_id,
+               'razorpay_payment_id': payment_id,
+               'razorpay_signature': signature
+               }
+            logger.info('razor post payload',order_id,payment_id,signature)
+            #print("signature id ",signature,"razorpay_id",razorpay_order_id)
+            # verify the payment signature.
+            result = client.utility.verify_payment_signature(
+                params_dict)
+            if result is not None:
+                amount =request.session.get('amount')
+                try:
+                    # capture the payemt
+                    client.payment.capture(payment_id, amount)
+                    done = Wallet(
+                      order_id=generate_order_id(),
+                      payment_id = transaction_id, 
+                      recharge_amount = float(amount) * 1.5,
+                      plan_recharge_date = plan_recharge_date,
+                      recharge_time = recharge_time,
+                      wallet_month= wallet_month,
+                      name = name,
+                      cust_id=muser_id,
+                      email_id=email_id,
+                      whatsapp_no=whatsapp_no,
+                      transaction_id=transaction_id,
+                     )
+                    done.save()
+                    aa=GurujiUsers.objects.filter(email_id=email_id)
+                    for i in aa:
+                       first_name1 = i.first_name
+                       last_name1 = i. last_name
+                       whatsapp_no = i.whatsapp_no
+
+                    name = name
+                    recipient_numbers=whatsapp_no
+                    print('ddddddddd',name,whatsapp_no)
+
+                    send_sms_wallet([recipient_numbers],name,amount)
+                    # render success page on successful caputre of payment
+                    return render(request,'login/pass.html')
+                except:
+ 
+                    # if there is an error while capturing payment.
+                    return render(request,"phonepe_fail.html")
+            else:
+ 
+                # if signature verification fails.
+                return render(request,"phonepe_fail.html")
+        except:
+ 
+            # if we don't find the required parameters in POST data
+            return HttpResponseBadRequest()
+    else:
+       # if other than POST request is made.
+        return HttpResponseBadRequest()
+              
+        
+        
         
 def execute_payment(request):
     payment_id = request.GET.get('paymentId')
@@ -5003,6 +5155,7 @@ def payment_success(request):
 
 def payment_cancel(request):
     return render(request, 'payment_cancel.html')
+
 
 
 
