@@ -5092,8 +5092,8 @@ def callback(request):
                     # capture the payemt
                     client.payment.capture(payment_id, amount)
                     done = Wallet(
-                      order_id=generate_order_id(),
-                      payment_id = transaction_id, 
+                      order_id=order_id,
+                      payment_id = payment_id, 
                       recharge_amount = float(amount) * 1.5,
                       plan_recharge_date = plan_recharge_date,
                       recharge_time = recharge_time,
