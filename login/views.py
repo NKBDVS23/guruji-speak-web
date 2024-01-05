@@ -4394,17 +4394,23 @@ def send_sms_wallet(recipient_numbers,name,amount):
     # EnableX credentials
     app_id = "64b4bd31112b540fbd054d49"
     app_key = "Wa4eAuUy5yhyEe5yyeRaueteguXa8y5ayeey"
-
+    print("amount from the callback is ",amount)
     # SMS details
     sender_id = "NKBDVN"
 
     var1 = name # Replace this with the actual value you want to pass
     var2 = amount
+    recharge_amount=str(amount)
+    print("***************")
+    print("And the converted recharge amount is ",recharge_amount)
+    print("***************")
 
-
-    message_template = "Dear {$var1}, Recharge successful {$var2} added to your wallet. Happy consulting. Regards NKB Divine Vedic Sciences"
+    message_template = "Dear {$var1}, Recharge successful {$var2}, added to your wallet. Happy consulting. Regards NKB Divine Vedic Sciences"
     
-    message = message_template.replace("{$var1}", name).replace("{$var2}", str(amount))
+    message = message_template.replace("{$var1}", name).replace("{$var2}", recharge_amount)
+    print("***************")
+    print("Message template is  ",message)
+    print("***************")
     # var1 = name # Replace this with the actual value you want to pass
     # Template message with {$ var1} placeholder
     
@@ -4426,7 +4432,7 @@ def send_sms_wallet(recipient_numbers,name,amount):
         "to": recipient_numbers,
         "data": {
             "var1": name,
-            "var2": amount
+            "var2": recharge_amount
         },
         "type": "sms",
         "reference": "XOXO",
@@ -5116,8 +5122,41 @@ def callback(request):
                 print('ddddddddd',name,whatsapp_no)
 
                 send_sms_wallet([recipient_numbers],name,amount)
+                plan_id = request.session.get('plan_id')
+                plan_data = Comment.objects.filter(plan_id=plan_id, object_id = muser_id, order_id = "")
                     # render success page on successful caputre of payment
-                return render(request,'login/pass.html')
+                for j in plan_data:
+                    if j.plan_name == "Stellar Insights": 
+                       plan_name = j.plan_name
+                       del request.session["plan_id"]
+                       context={'plan_name':plan_name}
+                       # return redirect('/ask_question_silver/')
+                       return render(request,'login/pass.html',context)
+                  
+
+                    elif j.plan_name == "Divine Revelations":
+                         del request.session["plan_id"]
+                         plan_name = j.plan_name
+                         context={'plan_name':plan_name}
+                    # return redirect('/ask_question_platinum/')
+                         return render(request,'login/pass.html',context)
+                    elif j.plan_name == "Celestial Guidance":
+                         del request.session["plan_id"]   
+                         plan_name = j.plan_name
+                         context={'plan_name':plan_name}
+                    # return redirect('/ask_question_gold/')
+                         return render(request,'login/pass.html',context)
+                    else:
+                    # return redirect('/customer-wallet/')
+                        plan_name = ''
+                        context={'plan_name':plan_name}
+                        return render(request,'login/pass.html',context)
+
+                context = {
+                
+                   'plan_name':None,
+                    }
+                return render(request,'login/pass.html',context)
                 #except:
  
                     # if there is an error while capturing payment.
