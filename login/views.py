@@ -5001,7 +5001,7 @@ def initiate_payment(request,paisa):
     data = admin_setting_plan.objects.all()
     plan = Plan_Purchase.objects.all()
     plan_data = Plan_Purchase.objects.filter(payment_id='')
-
+    
     # Add the 'geolocation_url' context variable to be used in the template
 
     current_datetime_utc = datetime.now(pytz.utc)
@@ -5034,6 +5034,9 @@ def initiate_payment(request,paisa):
     request.session['name'] = f'{request.user.first_name} {request.user.last_name}'
     request.session['email_id'] = request.user.email_id
     request.session['whatsapp_no'] = request.user.whatsapp_no
+    
+    
+    #request.session['plan_id']=
     if request.method == "GET":
         
         client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZORPAY_KEY_SECRET ))
@@ -5062,7 +5065,7 @@ from django.http import HttpResponseBadRequest
 @csrf_exempt
 def callback(request):
     
-    plan_id = request.session.get('plan_id')
+    #plan_id = request.session.get('plan_id')
     transaction_id = request.session.get('transaction_id')
     muser_id = request.session.get('muser_id')
     amount =request.session.get('amount')
@@ -5072,6 +5075,8 @@ def callback(request):
     name = request.session.get('name')
     email_id = request.session.get('email_id')
     whatsapp_no =request.session.get('whatsapp_no')
+    plan_id = request.session.get('plan_id')
+    plan_data = Comment.objects.filter(plan_id=plan_id, object_id = muser_id, order_id = "")
      # only accept POST request.
     if request.method == "POST":
         #logger.info('razor post payload',request.POST)
@@ -5122,8 +5127,7 @@ def callback(request):
                 print('ddddddddd',name,whatsapp_no)
 
                 send_sms_wallet([recipient_numbers],name,amount)
-                plan_id = request.session.get('plan_id')
-                plan_data = Comment.objects.filter(plan_id=plan_id, object_id = muser_id, order_id = "")
+   
                     # render success page on successful caputre of payment
                 for j in plan_data:
                     if j.plan_name == "Stellar Insights": 
@@ -5155,14 +5159,14 @@ def callback(request):
                 context = {
                 
                    'plan_name':None,
-                    }
+                }
                 return render(request,'login/pass.html',context)
                 #except:
  
                     # if there is an error while capturing payment.
                     ##return render(request,"phonepe_fail.html")
             else:
- 
+                
                 # if signature verification fails.
                 return render(request,"phonepe_fail.html")
         except:
